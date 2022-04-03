@@ -4,7 +4,7 @@ This is an RESTful API build with GoLang and the [Gin Web Framework](https://gin
 
 ## Motivation
 
-This is designed to help relieve users of the [analysis paralysis](https://en.wikipedia.org/wiki/Analysis_paralysis) when deciding what to eat for lunch or dinner.
+This is designed to help relieve users of the [analysis paralysis](https://en.wikipedia.org/wiki/Analysis_paralysis) when deciding what to eat for lunch or dinner. At some point in the future there will be a Wheel of Fortune type wheel that cycles through food styles to provide visual feedback for this API.
 
 ## Endpoints
 

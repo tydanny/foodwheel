@@ -1,8 +1,10 @@
 package main
 
 import (
+	"math/rand"
 	"net/http"
 	"sync"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -32,6 +34,8 @@ func main() {
 	router.GET("/cuisines", getCuisines)
 	router.GET("/cuisines/:name", getCuisineByName)
 	router.POST("/cuisines", postCuisines)
+
+	router.GET("/spin", getSpin)
 
 	router.Run("localhost:8080")
 }
@@ -86,4 +90,12 @@ func postCuisines(c *gin.Context) {
 	Lock.Unlock()
 
 	c.IndentedJSON(http.StatusCreated, newCuisine)
+}
+
+func getSpin(c *gin.Context) {
+	randNum := rand.New(rand.NewSource(time.Now().UnixNano())).Intn(len(cuisines))
+
+	Lock.Lock()
+	c.IndentedJSON(http.StatusOK, cuisines[randNum])
+	Lock.Unlock()
 }
