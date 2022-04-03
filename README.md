@@ -1,6 +1,6 @@
 # Food Wheel
 
-This is an RESTful API build with GoLang and the [Gin Web Framework](https://gin-gonic.com/docs/) to determine what kind of food to eat.
+This is an RESTful API build with GoLang and the [Gin Web Framework](https://gin-gonic.com/docs/) to determine what kind of food to eat. This was built using the following [tutorial](https://go.dev/doc/tutorial/web-service-gin).
 
 ## Motivation
 
@@ -8,7 +8,17 @@ This is designed to help relieve users of the [analysis paralysis](https://en.wi
 
 ## Endpoints
 
-### /cuisine
+### /cuisines
 
-- `GET` - Get a randomly determined style of food from the default list, returned as JSON
+- `GET` - Get the list of all cuisines and their dishes
 - `POST` - Add a new cuisine or style of food from request data sent as JSON
+
+### /cuisines/:Name
+
+- `GET` - Get a cuisine by its Name, returning its dishes as JSON
+
+### /spin
+
+- `GET` - Get a randomly determined style of food, returned as JSON
+
+> **Note:** For now cuisines are stored in memory for simplicity. A better design would be to use a database.
