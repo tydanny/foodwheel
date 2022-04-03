@@ -13,7 +13,7 @@ This is designed to help relieve users of the [analysis paralysis](https://en.wi
 - `GET` - Get the list of all cuisines and their dishes
 - `POST` - Add a new cuisine or style of food from request data sent as JSON
 
-### /cuisines/:Name
+### /cuisines/:name
 
 - `GET` - Get a cuisine by its Name, returning its dishes as JSON
 

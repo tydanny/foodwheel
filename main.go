@@ -2,6 +2,7 @@ package main
 
 import (
 	"net/http"
+	"sync"
 
 	"github.com/gin-gonic/gin"
 )
@@ -12,6 +13,8 @@ type cuisine struct {
 	// Region    string
 	Dishes foodItems
 }
+
+var Lock sync.Mutex
 
 type foodItems []string
 
@@ -27,6 +30,8 @@ var cuisines = []cuisine{
 func main() {
 	router := gin.Default()
 	router.GET("/cuisines", getCuisines)
+	router.GET("/cuisines/:name", getCuisineByName)
+	router.POST("/cuisines", postCuisines)
 
 	router.Run("localhost:8080")
 }
@@ -39,5 +44,46 @@ func getCuisines(c *gin.Context) {
 	// practice, the indented form is much easier to work
 	// with when debugging and the size difference is
 	// usually small.
+	Lock.Lock()
 	c.IndentedJSON(http.StatusOK, cuisines)
+	Lock.Unlock()
+}
+
+func getCuisineByName(c *gin.Context) {
+	name := c.Param("name")
+
+	// TODO: there is a better way to do this with a map
+	// Loop over cuisines and find cuisine
+	// whose name matches parameter
+	Lock.Lock()
+	defer Lock.Unlock()
+	for _, cuisine := range cuisines {
+		if cuisine.Name == name {
+			c.IndentedJSON(http.StatusOK, cuisine)
+			return
+		}
+	}
+
+	c.IndentedJSON(http.StatusNotFound, gin.H{"message": "cuisine not found"})
+}
+
+// postCuisines add a new cuisines from JSON in the
+// received request body
+func postCuisines(c *gin.Context) {
+	var newCuisine cuisine
+
+	// BindJSON binds the received JSON to
+	// newCuisine
+	if err := c.BindJSON(&newCuisine); err != nil {
+		return
+	}
+
+	// Add the new cuisine to the list
+	// remember, since this is stored in memory
+	// changes are lost on restart of the container
+	Lock.Lock()
+	cuisines = append(cuisines, newCuisine)
+	Lock.Unlock()
+
+	c.IndentedJSON(http.StatusCreated, newCuisine)
 }
