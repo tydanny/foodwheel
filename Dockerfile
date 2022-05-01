@@ -1,15 +1,25 @@
-FROM golang:1.18
+FROM golang:1.18 as builder
 
-WORKDIR /app
+ENV CGO_ENABLED=0 \
+    GOOS=linux
 
-COPY go.mod go.sum ./
-RUN go mod download
+WORKDIR /build
 
 # just copy main.go for now
 # if the app becomes more complex 
 # this will need to be changed
-COPY main.go .
+COPY go.mod go.sum main.go ./
+RUN go mod download && go mod verify
+
+RUN go build -a -o app .
+
+
+FROM alpine:latest
 
 EXPOSE 8080
 
-CMD go run .
+WORKDIR /app
+
+COPY --from=builder /build/app .
+
+ENTRYPOINT ./app
