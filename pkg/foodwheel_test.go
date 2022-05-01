@@ -1,4 +1,4 @@
-package v1alpha1_test
+package foodwheel_test
 
 import (
 	"encoding/json"
@@ -8,7 +8,7 @@ import (
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	api "github.com/tydanny/foodwheel/apis/v1alpha1"
+	api "github.com/tydanny/foodwheel/pkg"
 )
 
 var _ = Describe("Foodwheel API", func() {

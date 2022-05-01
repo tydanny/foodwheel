@@ -2,13 +2,13 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
-	api "github.com/tydanny/foodwheel/apis/v1alpha1"
+	foodwheel "github.com/tydanny/foodwheel/pkg"
 )
 
 func main() {
 	router := gin.Default()
 
-	api.InitializeRoutes(router)
+	foodwheel.InitializeRoutes(router)
 
 	router.Run(":3000")
 }

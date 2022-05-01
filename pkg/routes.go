@@ -1,4 +1,4 @@
-package v1alpha1
+package foodwheel
 
 import "github.com/gin-gonic/gin"
 
