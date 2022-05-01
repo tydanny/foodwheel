@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
-	api "github.com/tydanny/foodwheel/apis/v1alpha1"
+	api "github.com/tydanny/foodwheel/v1alpha1"
 )
 
 func main() {
