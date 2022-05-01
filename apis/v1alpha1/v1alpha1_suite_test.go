@@ -10,7 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	api "github.com/tydanny/foodwheel/v1alpha1"
+	api "github.com/tydanny/foodwheel/apis/v1alpha1"
 )
 
 var router *gin.Engine
