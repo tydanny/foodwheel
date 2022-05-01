@@ -7,7 +7,7 @@ run: build
 stop:
 	docker container stop foodwheel
 
-rm: stop
+clean: stop
 	docker container rm foodwheel
 
 validate: fmt vet

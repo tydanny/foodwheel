@@ -8,7 +8,8 @@ WORKDIR /build
 # just copy main.go for now
 # if the app becomes more complex 
 # this will need to be changed
-COPY go.mod go.sum main.go ./
+COPY go.mod go.sum cmd/main.go ./
+COPY pkg/ ./pkg
 RUN go mod download && go mod verify
 
 RUN go build -a -o app .
