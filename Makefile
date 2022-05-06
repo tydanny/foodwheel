@@ -1,16 +1,17 @@
-build: validate
+build: fmt vet
 	docker build -t foodwheel .
 
-run: build
+deploy: build
 	docker run -d -p 8080:3000 --name foodwheel foodwheel
+
+run: fmt vet
+	go run cmd/main.go
 
 stop:
 	docker container stop foodwheel
 
 clean: stop
 	docker container rm foodwheel
-
-validate: fmt vet
 
 fmt:
 	go fmt ./...
