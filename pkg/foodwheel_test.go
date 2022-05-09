@@ -45,7 +45,7 @@ var _ = Describe("Foodwheel API", func() {
 
 				Expect(naCuisine.Name).To(Equal("North_American"))
 				Expect(naCuisine.Dishes[0]).To(Equal("Burgers"))
-				Expect(naCuisine.Dishes[1]).To(Equal("Fired Chicken"))
+				Expect(naCuisine.Dishes[1]).To(Equal("Fried Chicken"))
 			})
 
 			It("should fail to return a cuisine that doesn't exist", func() {
