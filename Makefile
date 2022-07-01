@@ -1,10 +1,12 @@
-build: fmt vet
+all: lint build 
+
+build: lint
 	docker build -t foodwheel .
 
-deploy: build
+deploy: stop clean build
 	docker run -d -p 8080:8080 --name foodwheel foodwheel
 
-run: fmt vet
+run: lint
 	go run cmd/main.go
 
 stop:
@@ -12,6 +14,9 @@ stop:
 
 clean: stop
 	docker container rm foodwheel
+
+lint:
+	golangci-lint run  --fix ./... -E gosec,gofmt,misspell,testpackage,whitespace
 
 fmt:
 	go fmt ./...

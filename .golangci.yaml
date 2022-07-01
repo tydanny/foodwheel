@@ -1,0 +1,8 @@
+# disable typecheck for testing files
+# for some reason it doesn't like the . import
+# of ginkgo and gomega
+issues:
+  exclude-rules:
+    - path: '(.+)_test\.go'
+      linters:
+        - typecheck

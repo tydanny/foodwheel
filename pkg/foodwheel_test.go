@@ -26,7 +26,8 @@ var _ = Describe("Foodwheel API", func() {
 				bodyBytes, err := ioutil.ReadAll(resp.Body)
 				Expect(err).ShouldNot(HaveOccurred())
 
-				json.Unmarshal(bodyBytes, &cuisines)
+				uMarshErr := json.Unmarshal(bodyBytes, &cuisines)
+				Expect(uMarshErr).NotTo(HaveOccurred())
 				Expect(cuisines).To(HaveLen(4))
 			})
 
@@ -40,8 +41,10 @@ var _ = Describe("Foodwheel API", func() {
 				Expect(resp).Should(HaveHTTPStatus(http.StatusOK))
 
 				naCuisine := api.Cuisine{}
-				bodyBytes, _ := ioutil.ReadAll(resp.Body)
-				json.Unmarshal(bodyBytes, &naCuisine)
+				bodyBytes, readErr := ioutil.ReadAll(resp.Body)
+				Expect(readErr).NotTo(HaveOccurred())
+				uMarshErr := json.Unmarshal(bodyBytes, &naCuisine)
+				Expect(uMarshErr).NotTo(HaveOccurred())
 
 				Expect(naCuisine.Name).To(Equal("North_American"))
 				Expect(naCuisine.Dishes[0]).To(Equal("Burgers"))
@@ -99,7 +102,8 @@ var _ = Describe("Foodwheel API", func() {
 
 				ranCuisine := api.Cuisine{}
 				bodyBytes, _ := ioutil.ReadAll(resp.Body)
-				json.Unmarshal(bodyBytes, &ranCuisine)
+				uMarshErr := json.Unmarshal(bodyBytes, &ranCuisine)
+				Expect(uMarshErr).NotTo(HaveOccurred())
 
 				Expect(ranCuisine.Name).ToNot(BeEmpty())
 				Expect(len(ranCuisine.Dishes)).To(BeNumerically(">", 0))

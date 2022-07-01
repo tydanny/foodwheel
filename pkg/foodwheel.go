@@ -82,6 +82,7 @@ func postCuisines(c *gin.Context) {
 }
 
 func getSpin(c *gin.Context) {
+	//nolint:gosec // doesn't need to be an unpredictable random number
 	randNum := rand.New(rand.NewSource(time.Now().UnixNano())).Intn(len(cuisines))
 
 	Lock.Lock()
