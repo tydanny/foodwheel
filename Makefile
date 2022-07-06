@@ -17,6 +17,10 @@ clean: stop
 
 lint:
 	golangci-lint run  --fix ./... -E gosec,gofmt,misspell,testpackage,whitespace
+	protolint lint -fix .
+
+test:
+	ginkgo run ./...
 
 fmt:
 	go fmt ./...
