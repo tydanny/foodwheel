@@ -1,6 +1,6 @@
-db = connect( 'mongodb://localhost/myDatabase' );
+db = connect( 'mongodb://localhost/cuisines' );
 
-db.cuisines.InsertMany([
+db.cuisines.insertMany([
   {
     "Name": "North_American",
     "Dishes": ["Burgers", "Fired Chicken"]
