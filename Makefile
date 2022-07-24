@@ -1,6 +1,7 @@
-IMAGES_DIR ?= "images"
-FOODWHEEL_IMAGE ?= "${IMAGES_DIR}/foodwheel"
-MONGODB_IMAGE ?= "${IMAGES_DIR}/testMongoDB"
+IMAGES_DIR ?= images
+FOODWHEEL_IMAGE ?= ${IMAGES_DIR}/foodwheel
+MONGODB_IMAGE ?= ${IMAGES_DIR}/testMongoDB
+STARTUP_SCRIPT ?= ${MONGODB_IMAGE}/scripts
 
 .PHONY: all
 all: lint build 
@@ -11,18 +12,20 @@ build: lint
 
 .PHONY: build-test
 build-test:
-	docker build -t test-mongodb -f ${MONGODB_IMAGE}/Dockerfile .
+	docker build -t test-mongo-db -f ${MONGODB_IMAGE}/Dockerfile .
 
 .PHONY: run-test-db
-run-test-db: build-test
-	docker run --rm -it -v mongoTestData:/data/db --name test-mongodb -d mongo
+run-test-db: build-test stop-test-db
+	mkdir -p /tmp/data
+	docker run --rm -it -v /tmp/data:/data/db --name test-mongodb -d test-mongo-db
 
 .PHONY: stop-test-db
 stop-test-db:
-	docker stop test-mongodb
+	-@docker stop test-mongodb
+	rm -rf /tmp/data
 
 .PHONY: deploy
-deploy: stop clean build
+deploy: stop build
 	docker run --rm -d --name foodwheel foodwheel
 
 .PHONY: run
@@ -31,11 +34,7 @@ run: lint
 
 .PHONY: stop
 stop:
-	docker container stop foodwheel
-
-.PHONY: clean
-clean: stop
-	docker container rm foodwheel
+	-docker container stop foodwheel
 
 .PHONY: lint
 lint:
@@ -45,11 +44,3 @@ lint:
 .PHONY: test
 test:
 	ginkgo run ./...
-
-.PHONY: fmt
-fmt:
-	go fmt ./...
-
-.PHONY: vet
-vet:
-	go vet ./...
