@@ -9,18 +9,18 @@ WORKDIR /build
 # if the app becomes more complex 
 # this will need to be changed
 COPY go.mod go.sum cmd/main.go ./
-COPY pkg/ ./pkg
+COPY pkg .
 RUN go mod download && go mod verify
 
 RUN go build -a -o app .
 
 
-FROM alpine:latest
+FROM scratch
 
-EXPOSE 8080
+EXPOSE 8081
 
 WORKDIR /app
 
 COPY --from=builder /build/app .
 
-ENTRYPOINT ./app
+ENTRYPOINT ["./app"]

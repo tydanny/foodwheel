@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package foodwheel;
+
+option go_package = "github.com/tydanny/foodwheel";
+
+service Foodwheel {
+  // GetCuisine streams all Cuisines
+  rpc GetCuisines (Empty) returns (stream Cuisine);
+
+  // GetCuisineByName returns a specific Cuisine based on the name
+  rpc GetCuisineByName (CuisineRequest) returns (Cuisine);
+
+  // AddCuisine adds a new Cuisine to the database
+  rpc AddCuisine (Cuisine) returns (Empty);
+
+  // Spin returns a random Cuisine
+  rpc Spin (Empty) returns (Cuisine);
+}
+
+message CuisineRequest {
+  string name = 1;
+}
+
+message Cuisine {
+  string name = 1;
+  repeated string dishes = 2;
+}
+
+message Empty {
+}
