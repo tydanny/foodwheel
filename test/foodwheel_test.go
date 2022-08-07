@@ -61,8 +61,12 @@ var _ = Describe("Foodwheel API", func() {
 
 			It("should create a new cuisine entry", func() {
 				newCuisine := &foodwheel.Cuisine{Name: "Korean", Dishes: []string{"BBQ Pork", "Kimchi"}}
-				_, addErr := client.AddCuisine(ctx, newCuisine)
+				respCuisine, addErr := client.AddCuisine(ctx, newCuisine)
 				Expect(addErr).ShouldNot(HaveOccurred())
+				Expect(respCuisine).To(HaveField("Name", Equal("Korean")))
+				Expect(respCuisine.GetDishes()).Should(
+					HaveLen(2),
+					ContainElements("BBQ Pork", "Kimchi"))
 			})
 
 			It("should be available for query", func() {

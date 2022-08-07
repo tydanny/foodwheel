@@ -11,6 +11,7 @@
 *.dll
 *.so
 *.dylib
+*.o
 
 # Test binary, built with `go test -c`
 *.test
@@ -33,3 +34,4 @@ go.work
 .vscode
 
 mongoTestData
+bin

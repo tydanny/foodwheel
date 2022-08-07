@@ -1,34 +1,22 @@
-package server
+package fwServer
 
 import (
 	"context"
 	"errors"
-	"flag"
 	"fmt"
-	"log"
 	"math/rand"
-	"net"
 	"sync"
 	"time"
 
 	"github.com/tydanny/foodwheel/pkg/foodwheel"
-	"google.golang.org/grpc"
 )
 
 type FoodwheelServer struct {
-	foodwheel.UnimplementedFoodwheelServer
+	foodwheel.FoodwheelServer
 
 	mu       sync.Mutex
 	Cuisines map[string]*foodwheel.Cuisine
 }
-
-var (
-	// tls        = flag.Bool("tls", false, "Connection uses TLS if true, else plain TCP")
-	// certFile   = flag.String("cert_file", "", "The TLS cert file")
-	// keyFile    = flag.String("key_file", "", "The TLS key file")
-	// jsonDBFile = flag.String("json_db_file", "", "A json file containing a list of Cuisines")
-	port = flag.Int("port", 50051, "The server port")
-)
 
 func (s *FoodwheelServer) GetCuisines(e *foodwheel.Empty, stream foodwheel.Foodwheel_GetCuisinesServer) error {
 	s.mu.Lock()
@@ -37,6 +25,7 @@ func (s *FoodwheelServer) GetCuisines(e *foodwheel.Empty, stream foodwheel.Foodw
 			return err
 		}
 	}
+	s.mu.Unlock()
 	return nil
 }
 
@@ -47,9 +36,9 @@ func (s *FoodwheelServer) GetCuisineByName(ctx context.Context, req *foodwheel.C
 	return nil, fmt.Errorf("requested cuisine \"%s\" not found", req.GetName())
 }
 
-func (s *FoodwheelServer) AddCuisine(ctx context.Context, c *foodwheel.Cuisine) (*foodwheel.Empty, error) {
+func (s *FoodwheelServer) AddCuisine(ctx context.Context, c *foodwheel.Cuisine) (*foodwheel.Cuisine, error) {
 	s.Cuisines[c.GetName()] = c
-	return &foodwheel.Empty{}, nil
+	return c, nil
 }
 
 func (s *FoodwheelServer) Spin(context.Context, *foodwheel.Empty) (*foodwheel.Cuisine, error) {
@@ -65,7 +54,7 @@ func (s *FoodwheelServer) Spin(context.Context, *foodwheel.Empty) (*foodwheel.Cu
 	return nil, errors.New("failed to retrieve a random cuisine")
 }
 
-func NewServer() *FoodwheelServer {
+func ExampleServer() *FoodwheelServer {
 	s := FoodwheelServer{Cuisines: make(map[string]*foodwheel.Cuisine)}
 	s.Cuisines["North_American"] = &foodwheel.Cuisine{
 		Name:   "North_American",
@@ -84,34 +73,6 @@ func NewServer() *FoodwheelServer {
 		Dishes: []string{"Chicken Tikka Masala", "Naan", "Kofta"},
 	}
 	return &s
-}
-
-func Main() {
-	flag.Parse()
-	lis, err := net.Listen("tcp", fmt.Sprintf("localhost:%d", *port))
-	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
-	}
-	var opts []grpc.ServerOption
-	// if *tls {
-	// 	if *certFile == "" {
-	// 		// *certFile = data.Path("x509/server_cert.pem")
-	// 	}
-	// 	if *keyFile == "" {
-	// 		// *keyFile = data.Path("x509/server_key.pem")
-	// 	}
-	// 	creds, err := credentials.NewServerTLSFromFile(*certFile, *keyFile)
-	// 	if err != nil {
-	// 		log.Fatalf("Failed to generate credentials %v", err)
-	// 	}
-	// 	opts = []grpc.ServerOption{grpc.Creds(creds)}
-	// }
-
-	grpcServer := grpc.NewServer(opts...)
-	foodwheel.RegisterFoodwheelServer(grpcServer, NewServer())
-	if servErr := grpcServer.Serve(lis); servErr != nil {
-		log.Fatalf("server exited unexpectedly: %v", servErr)
-	}
 }
 
 // var exampleCuisines = []byte(`[{
