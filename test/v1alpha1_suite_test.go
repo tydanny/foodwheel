@@ -9,7 +9,7 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/tydanny/foodwheel/pkg/foodwheel"
-	"github.com/tydanny/foodwheel/pkg/server"
+	"github.com/tydanny/foodwheel/pkg/fwServer"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/test/bufconn"
@@ -50,7 +50,7 @@ var _ = AfterSuite(func() {
 func init() {
 	lis = bufconn.Listen(bufSize)
 	testServer = grpc.NewServer()
-	foodwheel.RegisterFoodwheelServer(testServer, server.NewServer())
+	foodwheel.RegisterFoodwheelServer(testServer, fwServer.ExampleServer())
 	go func() {
 		if servErr := testServer.Serve(lis); servErr != nil {
 			log.Fatalf("server exited unexpectedly: %v", servErr)

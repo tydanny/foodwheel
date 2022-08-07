@@ -12,7 +12,7 @@ service Foodwheel {
   rpc GetCuisineByName (CuisineRequest) returns (Cuisine);
 
   // AddCuisine adds a new Cuisine to the database
-  rpc AddCuisine (Cuisine) returns (Empty);
+  rpc AddCuisine (Cuisine) returns (Cuisine);
 
   // Spin returns a random Cuisine
   rpc Spin (Empty) returns (Cuisine);
