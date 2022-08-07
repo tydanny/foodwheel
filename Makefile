@@ -10,7 +10,7 @@ build: lint test generate
 	go build -a -o bin/foodwheel cmd/server/main.go
 
 .PHONY: image
-image: generate
+image: generate lint test
 	docker build -t foodwheel -f ${FOODWHEEL_IMAGE}/Dockerfile .
 
 .PHONY: build-test-db
@@ -39,6 +39,7 @@ run: lint
 stop:
 	-docker container stop foodwheel
 
+.PHONY: generate
 generate:
 	protoc --go_out=. --go_opt=paths=source_relative \
 		--go-grpc_out=. --go-grpc_opt=paths=source_relative \
