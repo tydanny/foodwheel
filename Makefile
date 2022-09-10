@@ -60,10 +60,3 @@ $(GOLANGCI): $(LOCALBIN)
 protolint: $(PROTOLINT)
 $(PROTOLINT): $(LOCALBIN)
 	test -s $(LOCALBIN)/protolint || GOBIN=$(LOCALBIN) go install github.com/yoheimuta/protolint/cmd/protolint@latest
-
-protoc: $(PROTOC)
-$(PROTOC): $(LOCALBIN)
-	test -s $(PROTOC)/protoc || curl -LO \
-		https://github.com/protocolbuffers/protobuf/releases/download/v3.15.8/protoc-3.15.8-linux-x86_64.zip \
-
-
