@@ -1,7 +1,5 @@
 IMAGES_DIR ?= images
 FOODWHEEL_IMAGE ?= ${IMAGES_DIR}/foodwheel
-MONGODB_IMAGE ?= ${IMAGES_DIR}/testMongoDB
-STARTUP_SCRIPT ?= ${MONGODB_IMAGE}/scripts
 
 .PHONY: all
 all: lint test build 
@@ -12,20 +10,6 @@ build: lint test generate
 .PHONY: image
 image: generate lint test
 	docker build -t foodwheel -f ${FOODWHEEL_IMAGE}/Dockerfile .
-
-.PHONY: build-test-db
-build-test-db:
-	docker build -t test-mongo-db -f ${MONGODB_IMAGE}/Dockerfile .
-
-.PHONY: run-test-db
-run-test-db: build-test-db stop-test-db
-	mkdir -p /tmp/data
-	docker run --rm -it -v /tmp/data:/data/db --name test-mongodb -d test-mongo-db
-
-.PHONY: stop-test-db
-stop-test-db:
-	-@docker stop test-mongodb
-	rm -rf /tmp/data
 
 .PHONY: deploy
 deploy: stop build
@@ -40,7 +24,7 @@ stop:
 	-docker container stop foodwheel
 
 .PHONY: generate
-generate:
+generate: $(PROTOC)
 	protoc --go_out=. --go_opt=paths=source_relative \
 		--go-grpc_out=. --go-grpc_opt=paths=source_relative \
 		pkg/foodwheel/foodwheel.proto
@@ -61,18 +45,25 @@ $(LOCALBIN):
 GINKGO ?= $(LOCALBIN)/ginkgo
 GOLANGCI ?= $(LOCALBIN)/golangci-lint
 PROTOLINT ?= $(LOCALBIN)/protolint
+PROTOC ?= $(LOCALBIN)/protoc
 
-.PHONY: ginkgo
+.PHONY: ginkgo protolint golangci-lint
+
 ginkgo: $(GINKGO)
 $(GINKGO): $(LOCALBIN)
 	test -s $(LOCALBIN)/gikngo || GOBIN=$(LOCALBIN) go install github.com/onsi/ginkgo/v2/ginkgo@latest
 
-.PHONY: golangci-lint
 golangci-lint: $(GOLANGCI)
 $(GOLANGCI): $(LOCALBIN)
 	test -s $(LOCALBIN)/golangci-lint || curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(LOCALBIN)
 
-.PHONY: protolint
 protolint: $(PROTOLINT)
 $(PROTOLINT): $(LOCALBIN)
 	test -s $(LOCALBIN)/protolint || GOBIN=$(LOCALBIN) go install github.com/yoheimuta/protolint/cmd/protolint@latest
+
+protoc: $(PROTOC)
+$(PROTOC): $(LOCALBIN)
+	test -s $(PROTOC)/protoc || curl -LO \
+		https://github.com/protocolbuffers/protobuf/releases/download/v3.15.8/protoc-3.15.8-linux-x86_64.zip \
+
+
