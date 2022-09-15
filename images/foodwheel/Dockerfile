@@ -1,26 +1,23 @@
-FROM golang:1.18 as builder
+FROM golang:1.19 as builder
 
 ENV CGO_ENABLED=0 \
     GOOS=linux
 
 WORKDIR /build
 
-# just copy main.go for now
-# if the app becomes more complex 
-# this will need to be changed
-COPY go.mod go.sum cmd/main.go ./
-COPY pkg .
-RUN go mod download && go mod verify
+COPY go.mod go.sum ./
+COPY pkg/ ./pkg/
+COPY cmd/ ./cmd/
 
-RUN go build -a -o app .
+RUN go build -a -o server ./cmd/main.go
 
 
-FROM scratch
+FROM gcr.io/distroless/static
 
 EXPOSE 8081
 
 WORKDIR /app
+COPY --from=builder --chown=nonroot /build/server .
+USER nonroot
 
-COPY --from=builder /build/app .
-
-ENTRYPOINT ["./app"]
+ENTRYPOINT ["/app/server"]
