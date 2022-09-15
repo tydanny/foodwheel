@@ -14,7 +14,7 @@ RUN go build -a -o server ./cmd/main.go
 
 FROM gcr.io/distroless/static
 
-EXPOSE 8081
+EXPOSE 50051
 
 WORKDIR /app
 COPY --from=builder --chown=nonroot:nonroot /build/server .

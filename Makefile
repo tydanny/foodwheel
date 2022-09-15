@@ -14,8 +14,8 @@ image: generate lint test
 image-redis-db:
 	docker build -t foodwheel-redis -p 6379:6379 -p 8001:8001 ${REDIS_IMAGE}
 
-deploy: stop build
-	docker run --rm -d --name foodwheel foodwheel
+deploy: stop
+	docker run --rm -d -p 50051:50051 --name foodwheel foodwheel
 
 run: lint
 	go run cmd/server/main.go
