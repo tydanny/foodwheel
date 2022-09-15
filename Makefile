@@ -2,7 +2,7 @@ IMAGES_DIR ?= images
 FOODWHEEL_IMAGE ?= ${IMAGES_DIR}/foodwheel
 REDIS_IMAGE ?= redis/redis-stack:latest
 
-.PHONY: all image deploy run stop generate
+.PHONY: all image deploy deploy-db run stop stop-db generate
 all: lint test build 
 
 build: lint test generate
@@ -11,17 +11,20 @@ build: lint test generate
 image: generate lint test
 	docker build -t foodwheel -f ${FOODWHEEL_IMAGE}/Dockerfile .
 
-image-redis-db:
-	docker build -t foodwheel-redis -p 6379:6379 -p 8001:8001 ${REDIS_IMAGE}
-
-deploy: stop
+deploy: stop deploy-db
 	docker run --rm -d -p 50051:50051 --name foodwheel foodwheel
+
+deploy-db: stop-db
+	docker run --rm -d -p 6379:6379 -p 8001:8001 --name foodwheel-redis ${REDIS_IMAGE}
 
 run: lint
 	go run cmd/server/main.go
 
-stop:
+stop: stop-db
 	-docker container stop foodwheel
+
+stop-db:
+	-docker container stop foodwheel-redis
 
 generate:
 	protoc --go_out=. --go_opt=paths=source_relative \
