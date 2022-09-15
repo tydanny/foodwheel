@@ -17,7 +17,7 @@ FROM gcr.io/distroless/static
 EXPOSE 8081
 
 WORKDIR /app
-COPY --from=builder --chown=nonroot /build/server .
+COPY --from=builder --chown=nonroot:nonroot /build/server .
 USER nonroot
 
 ENTRYPOINT ["/app/server"]
