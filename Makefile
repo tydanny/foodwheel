@@ -2,7 +2,7 @@ IMAGES_DIR ?= images
 FOODWHEEL_IMAGE ?= ${IMAGES_DIR}/foodwheel
 REDIS_IMAGE ?= redis/redis-stack:latest
 
-.PHONY: all image deploy deploy-db run stop stop-db generate
+.PHONY: all image deploy deploy-db run stop stop-db generate lint fmt
 all: lint test build 
 
 build: lint test generate
@@ -32,9 +32,15 @@ generate:
 		pkg/foodwheel/foodwheel.proto
 
 lint: golangci-lint protolint
-	protolint lint -fix .
-	golangci-lint run  --fix ./... -E gosec,gofmt,misspell,testpackage,whitespace
+	$(PROTOLINT) lint .
+	$(GOLANGCI) run ./...
 	go vet ./...
+
+fmt:
+	$(PROTOLINT) lint -fix .
+	$(GOLANGCI) run --fix ./...
+	go fmt ./...
+	
 
 test: ginkgo
 	$(GINKGO) run ./...
