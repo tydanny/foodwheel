@@ -64,9 +64,9 @@ var _ = Describe("Foodwheel API", func() {
 				respCuisine, addErr := client.AddCuisine(ctx, newCuisine)
 				Expect(addErr).ShouldNot(HaveOccurred())
 				Expect(respCuisine).To(HaveField("Name", Equal("Korean")))
-				Expect(respCuisine.GetDishes()).Should(
+				Expect(respCuisine.GetDishes()).Should(SatisfyAll(
 					HaveLen(2),
-					ContainElements("BBQ Pork", "Kimchi"))
+					ContainElements("BBQ Pork", "Kimchi")))
 			})
 
 			It("should be available for query", func() {
