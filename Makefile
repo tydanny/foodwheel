@@ -5,7 +5,7 @@ REDIS_IMAGE ?= redis/redis-stack:latest
 .PHONY: all image deploy deploy-db run stop stop-db generate lint fmt
 all: lint test build 
 
-build: lint test generate
+build: lint test
 	go build -a -o bin/foodwheel cmd/main.go
 
 image: generate lint test
