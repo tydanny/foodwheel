@@ -66,7 +66,7 @@ $(GINKGO): $(LOCALBIN)
 
 golangci-lint: $(GOLANGCI)
 $(GOLANGCI): $(LOCALBIN)
-	test -s $(LOCALBIN)/golangci-lint || curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(LOCALBIN)
+	test -s $(LOCALBIN)/golangci-lint || curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b ./bin v1.51.2
 
 protolint: $(PROTOLINT)
 $(PROTOLINT): $(LOCALBIN)
