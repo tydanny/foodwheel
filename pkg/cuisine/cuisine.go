@@ -14,6 +14,10 @@ func NewCuisine(name string, dishes ...Dish) Cuisine {
 	return Cuisine{name, dishes}
 }
 
+func (c *Cuisine) GetName() string {
+	return c.Name
+}
+
 type Dish struct {
 	Name string
 	Tags []string

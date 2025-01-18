@@ -1,6 +1,29 @@
 package main
 
+import (
+	"fmt"
+
+	"github.com/spf13/pflag"
+	"github.com/tydanny/foodwheel/internal/config"
+	"go.uber.org/zap"
+)
+
 type mode string
+
+var _ pflag.Value = (*mode)(nil)
+
+func (m mode) Set(s string) error {
+	m = mode(s)
+	return nil
+}
+
+func (m mode) Type() string {
+	return "mode"
+}
+
+func (m mode) String() string {
+	return string(m)
+}
 
 const (
 	DEV  mode = "DEV"
@@ -17,32 +40,27 @@ var (
 
 func main() {
 	// Setup flags
-	// mode := DEV
-	// flag.Func("mode", "The mode the server will run in (DEV/PROD)", func(s string) error {
-	// 	switch s {
-	// 	case "DEV":
-	// 		mode = DEV
-	// 		return nil
-	// 	case "PROD":
-	// 		mode = PROD
-	// 		return nil
-	// 	}
-	// 	return errors.New("mode must be either DEV or PROD")
-	// })
-	// flag.Parse()
+	mode := DEV
+	pflag.Var(&mode, "mode", "The server mode")
+
+	pflag.Parse()
 
 	// Setup logger
-	// var zapLog *zap.Logger
-	// var logErr error
-	// if mode == PROD {
-	// 	zapLog, logErr = zap.NewProduction()
-	// } else {
-	// 	zapLog, logErr = zap.NewDevelopment()
-	// }
-	// if logErr != nil {
-	// 	panic(fmt.Errorf("failed to initialize logger: %v", logErr))
-	// }
-	// log := zapr.NewLogger(zapLog)
+	var zapLog *zap.Logger
+	var logErr error
+	if mode == PROD {
+		zapLog, logErr = zap.NewProduction()
+	} else {
+		zapLog, logErr = zap.NewDevelopment()
+	}
+	if logErr != nil {
+		panic(fmt.Errorf("failed to initialize logger: %v", logErr))
+	}
+
+	zap.ReplaceGlobals(zapLog)
+
+	//Initialize config
+	config.InitializeConfig(zapLog)
 
 	// // Setup listener
 	// lis, lisErr := net.Listen("tcp", fmt.Sprintf(":%d", (*port)))
