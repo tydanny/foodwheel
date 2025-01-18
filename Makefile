@@ -1,11 +1,9 @@
-IMAGES_DIR ?= images
-FOODWHEEL_IMAGE ?= ${IMAGES_DIR}/foodwheel
-REDIS_IMAGE ?= redis/redis-stack:latest
+IMG ?= foodwheel
 
 GOLANGCI_VERSION ?= v1.62.2
 
 .PHONY: all
-all: lint test build 
+all: lint test build protoall
 
 .PHONY: build
 build:
@@ -13,33 +11,28 @@ build:
 
 .PHONY: image
 image: generate lint test
-	docker build -t foodwheel -f ${FOODWHEEL_IMAGE}/Dockerfile .
+	docker build -t ${IMG} -f images/foodwheel/Dockerfile .
 
-.PHONY: deploy
-deploy: stop deploy-db
-	docker run --rm -d -p 50051:50051 --name foodwheel foodwheel
+.PHONY: start
+start:
+	podman compose --file ./test/docker-compose.yaml up --detach
 
-.PHONY: deploy-db
-deploy-db: stop-db
-	docker run --rm -d -p 6379:6379 -p 8001:8001 --name foodwheel-redis ${REDIS_IMAGE}
+.PHONY: stop
+stop:
+	podman compose --file ./test/docker-compose.yaml down
 
 .PHONY: run
 run:
 	go run cmd/server/main.go
 
-.PHONY: stop
-stop: stop-db
-	-docker container stop foodwheel
+.PHONY: protoall generate protolint
+protoall: generate protolint
 
-.PHONY: stop-db
-stop-db:
-	-docker container stop foodwheel-redis
-
-.PHONY: generate
 generate:
-	protoc --go_out=. --go_opt=paths=source_relative \
-		--go-grpc_out=. --go-grpc_opt=paths=source_relative \
-		pkg/foodwheel/foodwheel.proto
+	buf generate
+
+protolint:
+	buf lint
 
 GOLANGCI ?= golangci-lint
 
@@ -85,16 +78,11 @@ test-ci:
 # This section that downloads tools needed to run some targets
 
 LOCALBIN ?= $(shell pwd)/bin
-PROTOLINT ?= $(LOCALBIN)/protolint
 
-.PHONY: protolint localbin bin
+.PHONY: localbin bin
 
 bin: localbin protolint
 
 localbin: $(LOCALBIN)
 $(LOCALBIN):
 	mkdir -p $(LOCALBIN)
-
-protolint: $(PROTOLINT)
-$(PROTOLINT): $(LOCALBIN)
-	test -s $(LOCALBIN)/protolint || GOBIN=$(LOCALBIN) go install github.com/yoheimuta/protolint/cmd/protolint@latest

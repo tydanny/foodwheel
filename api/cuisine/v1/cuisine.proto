@@ -1,0 +1,16 @@
+edition = "2023";
+
+package cuisine.v1;
+
+import "google/api/field_behavior.proto";
+
+option go_package = "github.com/tydanny/foodwheel";
+
+// A style of food.
+message Cuisine {
+  // The name of the cuisine.
+  string name = 1 [(google.api.field_behavior) = IDENTIFIER];
+
+  // A description of the cuisine.
+  string description = 2;
+}
