@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package cuisines.v1;
+
+import "cuisines/v1/cuisine.proto";
+import "google/api/field_behavior.proto";
+
+option go_package = "github.com/tydanny/foodwheel/api/cuisines/v1";
+
+// A request message for CreateCuisine.
+message CreateCuisineRequest {
+  // The id of the cuisine to create.
+  // This will become the final component of the cuisine's name.
+  string cuisine_id = 1 [(google.api.field_behavior) = REQUIRED];
+
+  // The cuisine to create.
+  Cuisine cuisine = 2 [(google.api.field_behavior) = REQUIRED];
+}

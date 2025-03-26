@@ -3,15 +3,22 @@ IMG ?= foodwheel
 GOLANGCI_VERSION ?= v1.62.2
 
 .PHONY: all
-all: lint test build protoall
+all: protoall lint test build
+
+GIT_COMMIT=$(shell git rev-parse HEAD)
+GIT_DIRTY=$(shell test -n "`git status --porcelain`" && echo "+CHANGES" || true)
+BUILD_DATE=$(shell TZ=UTC0 git show --quiet --date='format-local:%Y-%m-%dT%T%z' --format="%cd")
+LDFLAGS="-X 'main.GitCommit=${GIT_COMMIT}${GIT_DIRTY}' -X 'main.BuildDate=${BUILD_DATE}'"
 
 .PHONY: build
 build:
-	go build -a -o bin/foodwheel cmd/main.go
+	go build -ldflags=${LDFLAGS} -a -o bin/foodwheel cmd/*.go
 
-.PHONY: image
-image: generate lint test
-	docker build -t ${IMG} -f images/foodwheel/Dockerfile .
+.PHONY: docker-build
+docker-build: generate
+	docker build -t ${IMG} \
+		--build-arg COMMIT=${LDFLAGS} \
+		.
 
 .PHONY: start
 start:
@@ -28,7 +35,7 @@ run:
 .PHONY: protoall generate protolint
 protoall: generate protolint
 
-generate:
+generate: protoc-gen-go protoc-gen-go-grpc
 	buf generate
 
 protolint:
@@ -39,6 +46,11 @@ GOLANGCI ?= golangci-lint
 .PHONY: lint
 lint:
 	$(GOLANGCI) run ./...
+	$(API-LINTER) --config aip-lint.yaml -I api/foodwheel -I api/googleapis $(shell find api/foodwheel -iname "*.proto")
+
+.PHONY: format
+format:
+	$(GOLANGCI) run --fix ./...
 
 .PHONY: fmt
 fmt:
@@ -75,9 +87,16 @@ GINKGO_RUNNER_CI ?= $(GINKGO) \
 test-ci:
 	$(GINKGO_RUNNER_CI) run ./...
 
-# This section that downloads tools needed to run some targets
+# This section downloads tools needed to run some targets
+
+API-LINTER-VERSION ?= v1.69.2
+PROTOC-VERSION ?= v1.36.5
+GRPC-VERSION ?= v1.5.1
 
 LOCALBIN ?= $(shell pwd)/bin
+API-LINTER ?= $(LOCALBIN)/api-linter
+PROTOC ?= $(LOCALBIN)/protoc-gen-go
+PROTOC-GEN-GO-GRPC ?= $(LOCALBIN)/protoc-gen-go-grpc
 
 .PHONY: localbin bin
 
@@ -86,3 +105,23 @@ bin: localbin protolint
 localbin: $(LOCALBIN)
 $(LOCALBIN):
 	mkdir -p $(LOCALBIN)
+
+.PHONY: api-linter
+api-linter: $(APILINTER)
+$(APILINTER): $(LOCALBIN)
+	GOBIN=$(LOCALBIN) go install github.com/googleapis/api-linter/cmd/api-linter@$(API-LINTER-VERSION)
+
+.PHONY: protoc-gen-go
+protoc-gen-go: $(PROTOC)
+$(PROTOC): $(LOCALBIN)
+	@GOBIN=$(LOCALBIN) go install google.golang.org/protobuf/cmd/protoc-gen-go@$(PROTOC-VERSION)
+
+.PHONY: protoc-gen-go-grpc
+protoc-gen-go-grpc: $(PROTOC-GEN-GO-GRPC)
+$(PROTOC-GEN-GO-GRPC): $(LOCALBIN)
+	@GOBIN=$(LOCALBIN) go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@$(GRPC-VERSION)
+
+.PHONY: api-linter
+api-linter: $(APILINTER)
+$(APILINTER): $(LOCALBIN)
+	GOBIN=$(LOCALBIN) go install github.com/googleapis/api-linter/cmd/api-linter@$(APILINTER_VERSION)

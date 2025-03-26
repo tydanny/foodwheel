@@ -1,0 +1,5 @@
+---
+- disabled_rules:
+    - core::0191::java-multiple-files
+    - core::0191::java-package
+    - core::0191::java-outer-classname

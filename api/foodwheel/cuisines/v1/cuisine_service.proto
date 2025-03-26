@@ -1,0 +1,54 @@
+syntax = "proto3";
+
+package cuisines.v1;
+
+import "cuisines/v1/create_cuisine_request.proto";
+import "cuisines/v1/cuisine.proto";
+import "cuisines/v1/delete_cuisine_request.proto";
+import "cuisines/v1/get_cuisine_request.proto";
+import "cuisines/v1/list_cuisine_request.proto";
+import "cuisines/v1/list_cuisine_response.proto";
+import "cuisines/v1/update_cuisine_request.proto";
+import "google/api/annotations.proto";
+import "google/api/client.proto";
+import "google/protobuf/empty.proto";
+
+option go_package = "github.com/tydanny/foodwheel/api/cuisines/v1";
+
+// A service that manages cuisines.
+service CuisineService {
+  // Retrieves a cuisine.
+  rpc GetCuisine(GetCuisineRequest) returns (Cuisine) {
+    option (google.api.http) = {get: "/v1/{name=messages/*}"};
+    option (google.api.method_signature) = "name";
+  }
+
+  // Lists Cuisines.
+  rpc ListCuisines(ListCuisinesRequest) returns (ListCuisinesResponse) {
+    option (google.api.http) = {get: "/v1/cuisines"};
+  }
+
+  // Create a new Cuisine.
+  rpc CreateCuisine(CreateCuisineRequest) returns (Cuisine) {
+    option (google.api.http) = {
+      post: "/v1/cuisines"
+      body: "cuisine"
+    };
+    option (google.api.method_signature) = "cuisine,cuisine_id";
+  }
+
+  // Update a Cuisine.
+  rpc UpdateCuisine(UpdateCuisineRequest) returns (Cuisine) {
+    option (google.api.http) = {
+      patch: "/v1/{cuisine.name=cuisines/*}"
+      body: "cuisine"
+    };
+    option (google.api.method_signature) = "cuisine,update_mask";
+  }
+
+  // Delete a Cuisine.
+  rpc DeleteCuisine(DeleteCuisineRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {delete: "/v1/{name=cuisines/*}"};
+    option (google.api.method_signature) = "name";
+  }
+}

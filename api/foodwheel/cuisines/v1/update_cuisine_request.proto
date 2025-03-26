@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package cuisines.v1;
+
+import "cuisines/v1/cuisine.proto";
+import "google/api/field_behavior.proto";
+import "google/protobuf/field_mask.proto";
+
+option go_package = "github.com/tydanny/foodwheel/api/cuisines/v1";
+
+// A request to UpdateCuisine.
+message UpdateCuisineRequest {
+  // The cuisine to update.
+  //
+  // The cuisine's `name` field is used to identify the cuisine to update.
+  Cuisine cuisine = 1 [(google.api.field_behavior) = REQUIRED];
+
+  // The list of fields to update.
+  google.protobuf.FieldMask update_mask = 2 [(google.api.field_behavior) = OPTIONAL];
+}

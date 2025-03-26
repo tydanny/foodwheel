@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package cuisines.v1;
+
+import "google/api/field_behavior.proto";
+import "google/api/resource.proto";
+
+option go_package = "github.com/tydanny/foodwheel/api/cuisines/v1";
+
+// A style of food.
+message Cuisine {
+  option (google.api.resource) = {
+    type: "foodwheel.com/Cuisine"
+    pattern: "cuisines/{cuisine}"
+    singular: "cuisine"
+    plural: "cuisines"
+  };
+  // The name of the cuisine.
+  string name = 1 [(google.api.field_behavior) = IDENTIFIER];
+
+  // A description of the cuisine.
+  string description = 2 [(google.api.field_behavior) = OPTIONAL];
+}
